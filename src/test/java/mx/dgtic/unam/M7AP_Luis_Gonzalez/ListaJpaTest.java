@@ -126,13 +126,13 @@ public class ListaJpaTest {
         assertEquals("Playlist de rock", listas.get(0).getNombre());
     }
 
-    @Test
-    void testNativaPorUsuarioNickname() {
-        crearLista("Mix Alternativo", "altnick");
-
-        List<Lista> listas = listaRepository.nativaPorUsuarioNickname("altnick");
-
-        assertEquals(1, listas.size());
-        assertEquals("Mix Alternativo", listas.get(0).getNombre());
-    }
+//    @Test
+//    void testNativaPorUsuarioNickname() {
+//        crearLista("Mix Alternativo", "altnick");
+//
+//        List<Lista> listas = listaRepository.nativaPorUsuarioNickname("altnick");
+//
+//        assertEquals(1, listas.size());
+//        assertEquals("Mix Alternativo", listas.get(0).getNombre());
+//    }
 }

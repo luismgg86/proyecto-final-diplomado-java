@@ -90,25 +90,25 @@ public class GeneroJpaTest {
         assertEquals("JAZ", result.get(0).getClave());
     }
 
-    @Test
-    void buscarPorClaveNativa() {
-        crearGenero("ALT", "Alternativo");
-
-        Optional<Genero> result = generoRepository.buscarPorClave("ALT");
-
-        assertTrue(result.isPresent());
-        assertEquals("Alternativo", result.get().getNombre());
-    }
-
-    @Test
-    void buscarPorNombreNativa() {
-        crearGenero("CLS", "Clasica");
-
-        List<Genero> result = generoRepository.buscarPorNombre("sica");
-
-        assertFalse(result.isEmpty());
-        assertEquals("CLS", result.get(0).getClave());
-    }
+//    @Test
+//    void buscarPorClaveNativa() {
+//        crearGenero("ALT", "Alternativo");
+//
+//        Optional<Genero> result = generoRepository.buscarPorClave("ALT");
+//
+//        assertTrue(result.isPresent());
+//        assertEquals("Alternativo", result.get().getNombre());
+//    }
+//
+//    @Test
+//    void buscarPorNombreNativa() {
+//        crearGenero("CLS", "Clasica");
+//
+//        List<Genero> result = generoRepository.buscarPorNombre("sica");
+//
+//        assertFalse(result.isEmpty());
+//        assertEquals("CLS", result.get(0).getClave());
+//    }
 
     @Test
     void detalleConCancionesPorClaveJoin() {

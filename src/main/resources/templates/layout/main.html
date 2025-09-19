@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo}">Sismus</title>
+
+    <!-- Bootstrap CSS local -->
+    <link th:href="@{/bootstrap/css/bootstrap.min.css}" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            height: 100vh;
+            background-color: #000;
+            padding: 20px;
+        }
+
+        .sidebar a {
+            color: #b3b3b3;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .sidebar a:hover {
+            color: white;
+        }
+
+        /* Tarjetas */
+        .card {
+            background-color: #181818;
+            border: none;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        /* Reproductor inferior */
+        .player {
+            background-color: #181818;
+            padding: 10px;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-2 sidebar">
+            <h2 class="text-white mb-4">Sismus</h2>
+            <a th:href="@{/}">Inicio</a>
+            <a th:href="@{/buscar}">Buscar</a>
+            <a th:href="@{/playlists}">Tus Playlists</a>
+            <hr class="text-secondary">
+            <a th:href="@{/favoritos}">Tus Favoritos</a>
+        </div>
+
+        <!-- Contenido dinámico -->
+        <div class="col-md-10 p-4">
+            <div th:replace="__${contenido}__"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Reproductor inferior -->
+<div class="player text-center">
+    <p class="mb-0">🎵 Reproduciendo: Canción Ejemplo - Artista</p>
+</div>
+
+<!-- Bootstrap JS local -->
+<script th:src="@{/bootstrap/js/jquery-3.6.3.js}"></script>
+<script th:src="@{/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

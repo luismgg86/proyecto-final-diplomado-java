@@ -1,6 +1,9 @@
 package mx.dgtic.unam.M7AP_Luis_Gonzalez.repository;
 
 import mx.dgtic.unam.M7AP_Luis_Gonzalez.model.Lista;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,29 +12,98 @@ import java.util.List;
 
 public interface ListaRepository extends JpaRepository<Lista, Integer> {
 
-    //Derivada 1
+    /* ==========================
+       Búsquedas básicas
+       ========================== */
+
+    // Buscar listas por nickname de usuario
     List<Lista> findByUsuario_Nickname(String nickname);
 
-    //Derivada 2
+    // Buscar listas por ID de usuario
     List<Lista> findByUsuario_Id(Integer id);
 
-    //Derivada 3
+    // Búsqueda parcial por nombre
     List<Lista> findByNombreContainingIgnoreCase(String nombre);
 
-    //Con relaciones 1
-    @Query("select l from Lista l join l.usuario u where u.correo = :correo")
+    // Paginación para catálogos
+    Page<Lista> findByUsuario_Nickname(String nickname, Pageable pageable);
+
+    // Traer lista con canciones y usuario en una sola query
+    @EntityGraph(attributePaths = {"usuario", "canciones"})
+    @Query("select l from Lista l where l.id = :id")
+    Lista findByIdConRelaciones(@Param("id") Integer id);
+
+    // Traer todas las listas con canciones y usuario
+    @EntityGraph(attributePaths = {"usuario", "canciones"})
+    @Query("select l from Lista l")
+    List<Lista> findAllConRelaciones();
+
+    /* ==========================
+       Consultas personalizadas
+       ========================== */
+
+    // Buscar listas por correo de usuario
+    @Query("""
+        select l
+        from Lista l
+        join l.usuario u
+        where u.correo = :correo
+    """)
     List<Lista> buscarPorCorreoUsuario(@Param("correo") String correo);
 
-    //Con relaciones 2
-    @Query("select l from Lista l join l.canciones c where c.titulo like %:titulo%")
+    // JPQL: Buscar listas que contienen canciones con un título específico
+    @Query("""
+        select DISTINCT l
+        from Lista l
+        join l.canciones c
+        where lower(c.titulo) like lower(concat('%', :titulo, '%'))
+    """)
     List<Lista> buscarPorTituloDeCancion(@Param("titulo") String titulo);
 
-    //Nativa
-    @Query(value = """
-        select l.*
-        from lista l
-        join usuario u on u.usuario_id = l.usuario_id
-        where u.nickname = :nickname
-    """, nativeQuery = true)
-    List<Lista> nativaPorUsuarioNickname(@Param("nickname") String nickname);
+    /* ==========================
+       Reportes y métricas
+       ========================== */
+
+    // Listas sin canciones registradas
+    @Query("""
+        select l
+        from Lista l
+        where l.canciones IS EMPTY
+    """)
+    List<Lista> listasVacias();
+
+    // Reporte: cantidad de canciones por lista
+    @Query("""
+        select l.nombre AS nombre, count(c) AS totalCanciones
+        from Lista l
+        left join l.canciones c
+        group by l.nombre
+        order by totalCanciones DESC
+    """)
+    List<Object[]> reporteConteoCancionesPorLista();
+
+    // Reporte: top listas con más canciones
+    @Query("""
+        select l.nombre AS nombre, count(c) AS totalCanciones
+        from Lista l
+        left join l.canciones c
+        group by l.id, l.nombre
+        order by totalCanciones DESC
+    """)
+    List<Object[]> topListasMasPopulares();
+
+    /* ==========================
+       Filtros combinados
+       ========================== */
+
+    // Buscar listas por usuario y nombre parcial
+    @Query("""
+        select l
+        from Lista l
+        join l.usuario u
+        where lower(u.nickname) = lower(:nickname)
+        AND lower(l.nombre) like lower(concat('%', :nombre, '%'))
+    """)
+    List<Lista> buscarPorUsuarioYNombre(@Param("nickname") String nickname,
+                                        @Param("nombre") String nombre);
 }

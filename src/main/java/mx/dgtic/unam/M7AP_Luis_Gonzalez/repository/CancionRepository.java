@@ -3,6 +3,7 @@ package mx.dgtic.unam.M7AP_Luis_Gonzalez.repository;
 import mx.dgtic.unam.M7AP_Luis_Gonzalez.model.Cancion;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,25 +11,47 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface CancionRepository extends JpaRepository<Cancion, Integer> {
-    //Derivada 1
+
+    /* ==========================
+       Búsquedas básicas
+       ========================== */
+
+    // Buscar canciones por nombre de artista (case-insensitive)
     List<Cancion> findByArtista_NombreContainingIgnoreCase(String nombreArtista);
-    //Derivada 2
+
+    // Buscar canciones por clave de género
     List<Cancion> findByGenero_Clave(String claveGenero);
-    //Derivada 3
+
+    // Buscar canciones en una lista específica
     List<Cancion> findByListas_Id(Integer listaId);
 
-    //Paginado
-    Page<Cancion> findByTituloContainingIgnoreCase(String q, Pageable pageable);
+    // Paginado para catálogos
+    Page<Cancion> findByTituloContainingIgnoreCase(String titulo, Pageable pageable);
 
-    //Nativa1 con relaciones
+    // Traer canciones con artista y género
+    @EntityGraph(attributePaths = {"artista", "genero"})
+    @Query("SELECT c FROM Cancion c")
+    List<Cancion> findAllConArtistaYGenero();
+
+    // Buscar una canción por ID cargando artista y género
+    @EntityGraph(attributePaths = {"artista", "genero"})
+    @Query("SELECT c FROM Cancion c WHERE c.id = :id")
+    Cancion findByIdConRelaciones(@Param("id") Integer id);
+
+    /* ==========================
+       Consultas personalizadas
+       ========================== */
+
+    // Nativa: buscar por nombre de artista
     @Query(value = """
-      select c.* from cancion c
+      select c.*
+      from cancion c
       join artista a on a.artista_id = c.artista_id
-      where a.nombre like %:nombre%
+      where lower(a.nombre) like lower(concat('%', :nombre, '%'))
     """, nativeQuery = true)
     List<Cancion> buscarPorNombreArtista(@Param("nombre") String nombre);
 
-    //Con relaciones
+    // Buscar por clave de género
     @Query("""
         select c
         from Cancion c
@@ -37,7 +60,7 @@ public interface CancionRepository extends JpaRepository<Cancion, Integer> {
     """)
     List<Cancion> buscarPorClaveGenero(@Param("clave") String clave);
 
-    //Nativa con relaciones
+    // Nativa: buscar por artista y género
     @Query(value = """
         select c.*
         from cancion c
@@ -49,5 +72,58 @@ public interface CancionRepository extends JpaRepository<Cancion, Integer> {
     List<Cancion> nativaPorArtistaYGenero(@Param("claveArtista") String claveArtista,
                                           @Param("claveGenero") String claveGenero);
 
-}
+    /* ==========================
+       Reportes y estadísticas
+       ========================== */
 
+    // Canciones sin lista asignada (registro incompleto)
+    @Query("""
+        select c
+        from Cancion c
+        where c.listas is empty
+    """)
+    List<Cancion> cancionesSinLista();
+
+    // Conteo de canciones por género
+    @Query("""
+        select g.nombre as genero, count(c) as total
+        from Cancion c
+        join c.genero g
+        group by g.nombre
+        order by total desc
+    """)
+    List<Object[]> reporteConteoPorGenero();
+
+    // Reporte: canciones más descargadas
+    @Query("""
+        select c.titulo AS titulo, COUNT(u) AS totalDescargas
+        from Cancion c
+        join c.descargas u
+        group by c.titulo
+        order by totalDescargas DESC
+    """)
+    List<Object[]> reporteCancionesMasDescargadas();
+
+    // Buscar canciones con mínimo número de descargas
+    @Query("""
+        select c
+        from Cancion c
+        where size(c.descargas) >= :minimo
+    """)
+    List<Cancion> cancionesConMinimoDescargas(@Param("minimo") int minimo);
+
+    /* ==========================
+       Búsquedas avanzadas
+       ========================== */
+
+    // Búsqueda por artista y título parcial
+    @Query("""
+        select c
+        from Cancion c
+        join c.artista a
+        where lower(a.nombre) like lower(concat('%', :artista, '%'))
+        and lower(c.titulo) like lower(concat('%', :titulo, '%'))
+    """)
+    List<Cancion> buscarPorArtistaYTitulo(@Param("artista") String artista,
+                                          @Param("titulo") String titulo);
+}

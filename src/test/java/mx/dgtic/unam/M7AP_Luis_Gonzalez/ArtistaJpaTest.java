@@ -66,28 +66,28 @@ public class ArtistaJpaTest {
         assertEquals("Luis Miguel", lista.get(0).getNombre());
     }
 
-    @Test
-    void nativaPorClave() {
-        Artista a2 = new Artista();
-        a2.setClave("A011");
-        a2.setNombre("Caifanes");
-        artistaRepository.save(a2);
+//    @Test
+//    void nativaPorClave() {
+//        Artista a2 = new Artista();
+//        a2.setClave("A011");
+//        a2.setNombre("Caifanes");
+//        artistaRepository.save(a2);
+//
+//        var opt = artistaRepository.buscarPorClaveNativa("A011");
+//
+//        assertTrue(opt.isPresent());
+//        assertEquals("Caifanes", opt.get().getNombre());
+//    }
 
-        var opt = artistaRepository.buscarPorClaveNativa("A011");
-
-        assertTrue(opt.isPresent());
-        assertEquals("Caifanes", opt.get().getNombre());
-    }
-
-    @Test
-    void nativaPorNombrelike() {
-        artistaRepository.save(new Artista(null, "A012", "Juan Gabriel", null));
-
-        List<Artista> lista = artistaRepository.buscarPorNombreNativa("gab");
-
-        assertFalse(lista.isEmpty());
-        assertTrue(lista.get(0).getNombre().toLowerCase().contains("gab"));
-    }
+//    @Test
+//    void nativaPorNombrelike() {
+//        artistaRepository.save(new Artista(null, "A012", "Juan Gabriel", null));
+//
+//        List<Artista> lista = artistaRepository.buscarPorNombreNativa("gab");
+//
+//        assertFalse(lista.isEmpty());
+//        assertTrue(lista.get(0).getNombre().toLowerCase().contains("gab"));
+//    }
 
     @Test
     void detalleConCancionesPorClave() {

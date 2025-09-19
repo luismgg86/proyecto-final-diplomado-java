@@ -1,0 +1,45 @@
+<!-- templates/playlists/playlists.html -->
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="fragment">
+
+    <h3 class="mb-4">Tus Playlists</h3>
+
+    <!-- Si no hay playlists -->
+    <p th:if="${#lists.isEmpty(playlists)}" class="text-center text-secondary">
+        No tienes playlists creadas todavía.
+    </p>
+
+    <!-- Mostrar playlists -->
+    <div class="row g-3" th:if="${!#lists.isEmpty(playlists)}">
+        <div class="col-6 col-md-3" th:each="playlist : ${playlists}">
+            <div class="card h-100">
+
+                <!-- Imagen fija por defecto -->
+                <img th:src="@{/images/default_playlist.jpg}" class="card-img-top" alt="Imagen de Playlist">
+
+                <div class="card-body">
+                    <!-- Nombre de la playlist -->
+                    <h6 class="card-title text-white mb-2" th:text="${playlist.nombre}">Nombre Playlist</h6>
+
+                    <!-- Fecha de creación -->
+                    <p class="card-text text-secondary small mb-2">
+                        Creada el
+                        <span th:text="${#temporals.format(playlist.fechaCreacion, 'dd/MM/yyyy')}">01/01/2025</span>
+                    </p>
+
+                    <!-- Total de canciones -->
+                    <small class="text-secondary">
+                        Canciones: <span th:text="${#lists.size(playlist.canciones)}">0</span>
+                    </small>
+                </div>
+
+                <!-- Botón inferior -->
+                <div class="card-footer text-center">
+                    <a th:href="@{'/playlists/' + ${playlist.id}}" class="btn btn-sm btn-outline-light">
+                        Ver Detalles
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

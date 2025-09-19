@@ -1,0 +1,26 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:fragment="fragment">
+    <h3 class="mb-4">Canciones Disponibles</h3>
+
+    <!-- Si no hay canciones -->
+    <p th:if="${#lists.isEmpty(canciones)}" class="text-center text-secondary">
+        No hay canciones registradas en la base de datos.
+    </p>
+
+    <!-- Mostrar canciones -->
+    <div class="row g-3" th:if="${!#lists.isEmpty(canciones)}">
+        <div class="col-6 col-md-3" th:each="cancion : ${canciones}">
+            <div class="card">
+                <img th:src="@{/images/default.jpg}" class="card-img-top" alt="Imagen de Canción">
+                <div class="card-body">
+                    <h6 class="card-title text-light" th:text="${cancion.titulo}">Título Canción</h6>
+                    <p class="card-text text-secondary" th:text="${cancion.artista.nombre}">Artista</p>
+                    <small class="text-secondary">
+                        Género: <span th:text="${cancion.genero.nombre}">Pop</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>
